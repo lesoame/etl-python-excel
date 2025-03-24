@@ -1,71 +1,78 @@
 import pandas as pd
 import streamlit as st
 from validator import SalesSheet
-from datetime import datetime
 from pydantic import ValidationError
 
-def validate_row(row):
-    try:
-        # Convert date string to date object
-        row['Date'] = datetime.strptime(row['Date'], '%Y-%m-%d').date()
-        
-        # Convert numeric columns to appropriate types
-        row['Amount_spent'] = float(row['Amount_spent'])
-        row['Impressions'] = int(row['Impressions'])
-        if pd.notna(row['Link_clicks']):
-            row['Link_clicks'] = int(row['Link_clicks'])
-        if pd.notna(row['Conversions']):
-            row['Conversions'] = int(row['Conversions'])
+def validate_data(df):
+    errors = []
+    validated_data = []
+    
+    # Define required columns based on SalesSheet model
+    required_columns = {
+        'Organizador', 'Ano_Mes', 'Dia_da_Semana', 'Tipo_Dia', 'Objetivo', 
+        'Date', 'AdSet_name', 'Amount_spent', 'Link_clicks', 'Impressions', 
+        'Conversions', 'Segmentacao', 'Tipo_de_Anuncio', 'Fase'
+    }
+    
+    # Add missing columns with None values
+    missing_columns = required_columns - set(df.columns)
+    for col in missing_columns:
+        df[col] = None
+    
+    for index, row in df.iterrows():
+        try:
+            # Convert DataFrame row to dictionary
+            data = row.to_dict()
             
-        # Validate using Pydantic model
-        user = SalesSheet(**row)
-        return True, None
-    except ValidationError as e:
-        return False, str(e)
-    except Exception as e:
-        return False, f"Unexpected error: {str(e)}"
+            # Remove NaN values
+            data = {k: v for k, v in data.items() if pd.notna(v)}
+            
+            # Validate data using the SalesSheet model
+            validated_record = SalesSheet(**data)
+            validated_data.append(validated_record)
+            
+        except ValidationError as e:
+            errors.append(f"Error in row {index + 2}: {str(e)}")
+    
+    return validated_data, errors
 
 def main():
-    st.title("CSV Data Validator")
-    st.write("Upload your CSV file to validate against the data model")
-
+    st.title("Campaign Data Validator")
+    st.write("Upload CSV file for validation")
+    
     uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
     
     if uploaded_file is not None:
         try:
+            # Read CSV file
             df = pd.read_csv(uploaded_file)
-            st.write("Preview of uploaded data:")
+            
+            st.write("Data Preview:")
             st.dataframe(df.head())
-
-            # Validation results containers
-            valid_rows = []
-            invalid_rows = []
             
-            # Progress bar
-            progress_bar = st.progress(0)
-            status_text = st.empty()
-            
-            # Validate each row
-            total_rows = len(df)
-            for index, row in df.iterrows():
-                progress = (index + 1) / total_rows
-                progress_bar.progress(progress)
-                status_text.text(f"Processing row {index + 1} of {total_rows}")
-                
-                is_valid, error = validate_row(row.to_dict())
-                if is_valid:
-                    valid_rows.append(index)
-                else:
-                    invalid_rows.append((index, error))
-            
-            # Display results
-            st.success(f"Validation complete! Valid rows: {len(valid_rows)}")
-            if invalid_rows:
-                st.error(f"Invalid rows found: {len(invalid_rows)}")
-                st.write("Details of invalid rows:")
-                for row_index, error in invalid_rows:
-                    st.write(f"Row {row_index + 1}: {error}")
-            
+            if st.button("Validate Data"):
+                with st.spinner("Validating data..."):
+                    validated_data, errors = validate_data(df)
+                    
+                    if errors:
+                        st.error("Validation errors were found:")
+                        for error in errors:
+                            st.write(error)
+                    else:
+                        st.success("All data was successfully validated!")
+                        
+                        # Show number of validated records
+                        st.write(f"Total validated records: {len(validated_data)}")
+                        
+                        # Option to download validated data
+                        df_validated = pd.DataFrame([data.dict() for data in validated_data])
+                        st.download_button(
+                            label="Download validated data",
+                            data=df_validated.to_csv(index=False),
+                            file_name="validated_data.csv",
+                            mime="text/csv"
+                        )
+                    
         except Exception as e:
             st.error(f"Error processing file: {str(e)}")
 
