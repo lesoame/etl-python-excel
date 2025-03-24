@@ -1,4 +1,4 @@
-Organizador,Ano_Mes,Dia_da_Semana,Tipo_Dia,Objetivo,Date,AdSet_name,Amount_spent,Link_clicks,Impressions,Conversions,Segmentação,Tipo_de_Anúncio,Fase
+Organizador,Ano_Mes,Dia_da_Semana,Tipo_Dia,Objetivo,Date,AdSet_name,Amount_spent,Link_clicks,Impressions,Conversions,Segmentacao,Tipo_de_Anuncio,Fase
 240,2024 | Março,Sexta-Feira,Dia útil,Leads,2024-03-01,topfunnel_lal1_compradores_estatico_v1,0.00,,0,,LookALike_Compradores_1,Estático,2º Lançamento | Leads
 241,2024 | Março,Sexta-Feira,Dia útil,Leads,2024-03-01,topfunnel_lal1_compradores_v1,3.64,5,89,3,LookALike_Compradores_1,Video,2º Lançamento | Leads
 242,2024 | Março,Sexta-Feira,Dia útil,Leads,2024-03-01,topfunnel_interesses_dados_v1,2.69,3,98,,Interesses_Dados,Video,2º Lançamento | Leads
