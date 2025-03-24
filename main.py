@@ -6,7 +6,7 @@ from ydata_profiling import ProfileReport
 df = pd.read_csv('data.csv')
 
 # Generate report
-profile = ProfileReport(df, title="Padas Profile Report")
+profile = ProfileReport(df, title="Pandas Profile Report")
 
 # Save report to file
 profile.to_file("output.html")

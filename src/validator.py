@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import date
 
-class User(BaseModel):
+class SalesSheet(BaseModel):
     Organizador: int = Field(..., description="Identificador do organizador")
     Ano_Mes: str = Field(..., description="Ano e mês do registro")
     Dia_da_Semana: str = Field(..., description="Dia da semana correspondente à data")
@@ -17,7 +17,3 @@ class User(BaseModel):
     Segmentacao: str = Field(..., description="Segmentação usada no anúncio")
     Tipo_de_Anuncio: str = Field(..., description="Tipo de anúncio")
     Fase: str = Field(..., description="Fase da campanha")
-
-user = User()
-print(user)
-#> name='John Doe'
