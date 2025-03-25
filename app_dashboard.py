@@ -1,6 +1,6 @@
 import pandas as pd
 import streamlit as st
-from validator import SalesSheet
+from src.validator import SalesSheet
 from pydantic import ValidationError
 
 def validate_data(df):
